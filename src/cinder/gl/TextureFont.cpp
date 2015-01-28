@@ -369,9 +369,10 @@ void TextureFont::drawGlyphs( const vector<pair<uint16_t,vec2> > &glyphMeasures,
 			destRect += glyphIt->second * scale;
 			destRect += vec2( floor( glyphInfo.mOriginOffset.x + 0.5f ), floor( glyphInfo.mOriginOffset.y ) ) * scale;
 			destRect += vec2( baseline.x, baseline.y - mFont.getAscent() * scale );
-			if( options.getPixelSnap() )
-				destRect -= vec2( destRect.x1 - floor( destRect.x1 ), destRect.y1 - floor( destRect.y1 ) );				
-			
+			if( options.getPixelSnap() ) {
+				destRect += glm::round( destRect.getUpperLeft() ) - destRect.getUpperLeft();
+			}
+
 			verts.push_back( destRect.getX2() ); verts.push_back( destRect.getY1() );
 			verts.push_back( destRect.getX1() ); verts.push_back( destRect.getY1() );
 			verts.push_back( destRect.getX2() ); verts.push_back( destRect.getY2() );
@@ -487,8 +488,9 @@ void TextureFont::drawGlyphs( const std::vector<std::pair<uint16_t,vec2> > &glyp
 			destRect += glyphIt->second * scale;
 			destRect += vec2( floor( glyphInfo.mOriginOffset.x + 0.5f ), floor( glyphInfo.mOriginOffset.y ) ) * scale;
 			destRect += vec2( offset.x, offset.y );
-			if( options.getPixelSnap() )
-				destRect -= vec2( destRect.x1 - floor( destRect.x1 ), destRect.y1 - floor( destRect.y1 ) );				
+			if( options.getPixelSnap() ) {
+				destRect += glm::round( destRect.getUpperLeft() ) - destRect.getUpperLeft();
+			}
 
 			// clip
 			Rectf clipped( destRect );
