@@ -676,18 +676,12 @@ Surface	TextBox::render( vec2 offset )
 {
 	createLines();
 
-//	float leading = 20.0f;
-
 	float sizeX = ( mSize.x <= 0 ) ? mCalculatedSize.x : mSize.x;
-	//	float sizeY = ( mSize.y <= 0 ) ? mCalculatedSize.y : mSize.y;
-	//	float sizeY = ( mSize.y <= 0 ) ? mCalculatedSize.y : (mSize.y + (leading * mLines.size()));
 	float sizeY;
 	if ( mSize.y <= 0 ) {
 		sizeY = (mCalculatedSize.y + (mLeading * mLines.size()));
-		cout << "1) sizeY = " << sizeY << endl;
 	} else {
 		sizeY = (mSize.y + (mLeading * mLines.size()));
-		cout << "2) sizeY = " << sizeY << endl;
 	}
 	sizeX = math<float>::ceil( sizeX );
 	sizeY = math<float>::ceil( sizeY );
@@ -698,15 +692,7 @@ Surface	TextBox::render( vec2 offset )
 	::CGContextSetTextMatrix( cgContext, CGAffineTransformIdentity );
 
 	for( vector<pair<shared_ptr<const __CTLine>,vec2> >::const_iterator lineIt = mLines.begin(); lineIt != mLines.end(); ++lineIt ) {
-
-		cout << "---------------------------------------------" << endl;
-		cout << "sizeY = " << sizeY << endl;
-		cout << "lineIt->second.y = " << lineIt->second.y << endl;
-		cout << "offset.y = " << offset.y << endl;
-		cout << "TOTAL = " << ( sizeY - lineIt->second.y + offset.y ) << endl;
-
 		int curIndex = lineIt - mLines.begin();
-
 		::CGContextSetTextPosition( cgContext, lineIt->second.x + offset.x, sizeY - lineIt->second.y - (mLeading * curIndex) + offset.y );
 		::CTLineDraw( lineIt->first.get(), cgContext );
 	}
