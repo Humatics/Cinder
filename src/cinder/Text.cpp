@@ -676,17 +676,17 @@ Surface	TextBox::render( vec2 offset )
 {
 	createLines();
 
-	float leading = 20.0f;
+//	float leading = 20.0f;
 
 	float sizeX = ( mSize.x <= 0 ) ? mCalculatedSize.x : mSize.x;
 	//	float sizeY = ( mSize.y <= 0 ) ? mCalculatedSize.y : mSize.y;
 	//	float sizeY = ( mSize.y <= 0 ) ? mCalculatedSize.y : (mSize.y + (leading * mLines.size()));
 	float sizeY;
 	if ( mSize.y <= 0 ) {
-		sizeY = (mCalculatedSize.y + (leading * mLines.size()));
+		sizeY = (mCalculatedSize.y + (mLeading * mLines.size()));
 		cout << "1) sizeY = " << sizeY << endl;
 	} else {
-		sizeY = (mSize.y + (leading * mLines.size()));
+		sizeY = (mSize.y + (mLeading * mLines.size()));
 		cout << "2) sizeY = " << sizeY << endl;
 	}
 	sizeX = math<float>::ceil( sizeX );
@@ -707,10 +707,10 @@ Surface	TextBox::render( vec2 offset )
 
 		int curIndex = lineIt - mLines.begin();
 
-		::CGContextSetTextPosition( cgContext, lineIt->second.x + offset.x, sizeY - lineIt->second.y - (leading * curIndex) + offset.y );
+		::CGContextSetTextPosition( cgContext, lineIt->second.x + offset.x, sizeY - lineIt->second.y - (mLeading * curIndex) + offset.y );
 		::CTLineDraw( lineIt->first.get(), cgContext );
 	}
-	
+
 	CGContextFlush( cgContext );
     CGContextRelease( cgContext );
     
