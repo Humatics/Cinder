@@ -632,9 +632,12 @@ void TextBox::createLines() const
 		mLines.push_back( make_pair( shared_ptr<__CTLine>( (__CTLine*)line, ::CFRelease ), lineOffset ) );
 		lineOffset.y += descent + leading;
 		mCalculatedSize.x = std::max( mCalculatedSize.x, (float)lineWidth );
-		mCalculatedSize.y += ascent + descent + leading;
+		// TODO: adding mLeading here so its added to mCalculatedSize, but we should ideally create a new createCfAttributedString() function which would take leading as a param, so the "leading" var here would contain what we currently have in "mLeading".
+		mCalculatedSize.y += ascent + descent + leading + mLeading;
 		range.location += range.length;
 	}
+
+	mCalculatedSize.y -= mLeading;
 
 	::CFRelease( attrStr );
 	::CFRelease( typeSetter );
@@ -677,12 +680,8 @@ Surface	TextBox::render( vec2 offset )
 	createLines();
 
 	float sizeX = ( mSize.x <= 0 ) ? mCalculatedSize.x : mSize.x;
-	float sizeY;
-	if ( mSize.y <= 0 ) {
-		sizeY = (mCalculatedSize.y + (mLeading * mLines.size()));
-	} else {
-		sizeY = (mSize.y + (mLeading * mLines.size()));
-	}
+	float sizeY = ( mSize.y <= 0 ) ? mCalculatedSize.y : mSize.y;
+
 	sizeX = math<float>::ceil( sizeX );
 	sizeY = math<float>::ceil( sizeY );
 

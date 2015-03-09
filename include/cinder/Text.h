@@ -148,7 +148,6 @@ class TextBox {
 	bool			mPremultiplied;
 	bool			mLigate;
 	mutable bool	mInvalid;
-	/// SOSO: added leading to TextBox.
 	float			mLeading;
 
 	mutable vec2	mCalculatedSize;
