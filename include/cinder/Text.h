@@ -92,7 +92,7 @@ class TextBox {
 	typedef enum Alignment { LEFT, CENTER, RIGHT } Alignment;
 	enum { GROW = 0 };
 	
-	TextBox() : mAlign( LEFT ), mSize( GROW, GROW ), mFont( Font::getDefault() ), mInvalid( true ), mColor( 1, 1, 1, 1 ), mBackgroundColor( 0, 0, 0, 0 ), mPremultiplied( false ), mLigate( true ) {}
+	TextBox() : mAlign( LEFT ), mSize( GROW, GROW ), mFont( Font::getDefault() ), mInvalid( true ), mColor( 1, 1, 1, 1 ), mBackgroundColor( 0, 0, 0, 0 ), mPremultiplied( false ), mLigate( true ), mLeading( 0.0f ) {}
 
 	TextBox&			size( ivec2 sz ) { setSize( sz ); return *this; }
 	TextBox&			size( int width, int height ) { setSize( ivec2( width, height ) ); return *this; }
@@ -128,6 +128,10 @@ class TextBox {
 	bool				getLigate() const { return mLigate; }
 	void				setLigate( bool ligateText ) { mLigate = ligateText; }
 
+	TextBox&			leading( float l ) { setLeading( l ); return *this; }
+	float				getLeading() const { return mLeading; }
+	void				setLeading( float l ) { mLeading = l; mInvalid = true; }
+
 	vec2									measure() const;
 	/** Returns a vector of pairs of glyph indices and the position of their left baselines
 		\warning Does not support word wrapping on Windows. **/
@@ -144,6 +148,7 @@ class TextBox {
 	bool			mPremultiplied;
 	bool			mLigate;
 	mutable bool	mInvalid;
+	float			mLeading;
 
 	mutable vec2	mCalculatedSize;
 #if defined( CINDER_COCOA )

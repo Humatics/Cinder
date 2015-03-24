@@ -632,9 +632,12 @@ void TextBox::createLines() const
 		mLines.push_back( make_pair( shared_ptr<__CTLine>( (__CTLine*)line, ::CFRelease ), lineOffset ) );
 		lineOffset.y += descent + leading;
 		mCalculatedSize.x = std::max( mCalculatedSize.x, (float)lineWidth );
-		mCalculatedSize.y += ascent + descent + leading;
+		// TODO: adding mLeading here so its added to mCalculatedSize, but we should ideally create a new createCfAttributedString() function which would take leading as a param, so the "leading" var here would contain what we currently have in "mLeading".
+		mCalculatedSize.y += ascent + descent + leading + mLeading;
 		range.location += range.length;
 	}
+
+	mCalculatedSize.y -= mLeading;
 
 	::CFRelease( attrStr );
 	::CFRelease( typeSetter );
@@ -675,21 +678,24 @@ vec2 TextBox::measure() const
 Surface	TextBox::render( vec2 offset )
 {
 	createLines();
-	
+
 	float sizeX = ( mSize.x <= 0 ) ? mCalculatedSize.x : mSize.x;
 	float sizeY = ( mSize.y <= 0 ) ? mCalculatedSize.y : mSize.y;
+
 	sizeX = math<float>::ceil( sizeX );
 	sizeY = math<float>::ceil( sizeY );
-	
+
 	Surface result( (int)sizeX, (int)sizeY, true );
 	ip::fill( &result, mBackgroundColor );
 	::CGContextRef cgContext = cocoa::createCgBitmapContext( result );
 	::CGContextSetTextMatrix( cgContext, CGAffineTransformIdentity );
-	
+
 	for( vector<pair<shared_ptr<const __CTLine>,vec2> >::const_iterator lineIt = mLines.begin(); lineIt != mLines.end(); ++lineIt ) {
-		::CGContextSetTextPosition( cgContext, lineIt->second.x + offset.x, sizeY - lineIt->second.y + offset.y );
+		int curIndex = lineIt - mLines.begin();
+		::CGContextSetTextPosition( cgContext, lineIt->second.x + offset.x, sizeY - lineIt->second.y - (mLeading * curIndex) + offset.y );
 		::CTLineDraw( lineIt->first.get(), cgContext );
 	}
+
 	CGContextFlush( cgContext );
     CGContextRelease( cgContext );
     
