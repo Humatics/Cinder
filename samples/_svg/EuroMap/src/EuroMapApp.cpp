@@ -1,7 +1,7 @@
 // Map of Europe copyright Wikiepedia:
 // http://en.wikipedia.org/wiki/File:Blank_map_of_Europe_-_Atelier_graphique_colors.svg
 
-#include "cinder/app/AppBasic.h"
+#include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
 #include "cinder/gl/Texture.h"
@@ -14,13 +14,14 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-class EuroMapApp : public AppBasic {
+class EuroMapApp : public App {
   public:
-  	void prepareSettings( Settings *settings );
-	void setup();
-	void mouseMove( MouseEvent event );	
-	void draw();
-	
+	static void prepareSettings( Settings *settings );
+
+	void		setup() override;
+	void		mouseMove( MouseEvent event ) override;
+	void		draw() override;
+
 	gl::TextureRef		mMapTex;
 	gl::TextureFontRef	mFont;
 	svg::DocRef			mMapDoc;
@@ -66,6 +67,7 @@ void EuroMapApp::mouseMove( MouseEvent event )
 
 void EuroMapApp::draw()
 {
+	gl::clear();
 	gl::enableAlphaBlending();
 	glLineWidth( 2.0f );
 	
@@ -92,4 +94,4 @@ void EuroMapApp::draw()
 }
 
 
-CINDER_APP_BASIC( EuroMapApp, RendererGl )
+CINDER_APP( EuroMapApp, RendererGl, EuroMapApp::prepareSettings )

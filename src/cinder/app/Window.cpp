@@ -24,12 +24,14 @@
 
 #include "cinder/Cinder.h"
 #include "cinder/app/Window.h"
-#include "cinder/app/App.h"
+#include "cinder/app/AppBase.h"
 
 #if defined( CINDER_MSW )
-	#include "cinder/app/AppImplMsw.h"
+	#include "cinder/app/msw/AppImplMsw.h"
 #elif defined( CINDER_WINRT )
-	#include "cinder/app/AppImplWinRT.h"
+	#include "cinder/app/winrt/WindowImplWinRt.h"
+#elif defined( CINDER_COCOA )
+	#include <Foundation/Foundation.h>
 #endif
 
 namespace cinder { namespace app {
@@ -276,97 +278,105 @@ UIViewController* Window::getNativeViewController()
 // Signal Emitters
 void Window::emitClose()
 {
-	mSignalClose();
+	mSignalClose.emit();
 }
 
 void Window::emitMove()
 {
-	getRenderer()->makeCurrentContext();
-	mSignalMove();
+	getRenderer()->makeCurrentContext( true );
+	mSignalMove.emit();
 }
 
 void Window::emitResize()
 {
-	getRenderer()->makeCurrentContext();
+	getRenderer()->makeCurrentContext( true );
 	getRenderer()->defaultResize();
-	mSignalResize();
+	mSignalResize.emit();
 	getApp()->resize();
 }
 
 void Window::emitDisplayChange()
 {
-	getRenderer()->makeCurrentContext();
-	mSignalDisplayChange();
+	getRenderer()->makeCurrentContext( true );
+	mSignalDisplayChange.emit();
 }
 
 void Window::emitMouseDown( MouseEvent *event )
 {
-	getRenderer()->makeCurrentContext();
-	mSignalMouseDown.set_combiner( EventCombiner<cinder::app::MouseEvent>( event ) );
-	mSignalMouseDown( *event );
+	getRenderer()->makeCurrentContext( true );
+
+	CollectorEvent<MouseEvent> collector( event );
+	mSignalMouseDown.emit( collector, *event );
 	if( ! event->isHandled() )
 		getApp()->mouseDown( *event );
 }
 
 void Window::emitMouseDrag( MouseEvent *event )
 {
-	getRenderer()->makeCurrentContext();
-	mSignalMouseDrag.set_combiner( EventCombiner<cinder::app::MouseEvent>( event ) );
-	mSignalMouseDrag( *event );
+	getRenderer()->makeCurrentContext( true );
+
+	CollectorEvent<MouseEvent> collector( event );
+	mSignalMouseDrag.emit( collector, *event );
 	if( ! event->isHandled() )
 		getApp()->mouseDrag( *event );
 }
 
 void Window::emitMouseUp( MouseEvent *event )
 {
-	getRenderer()->makeCurrentContext();
-	mSignalMouseUp.set_combiner( EventCombiner<cinder::app::MouseEvent>( event ) );
-	mSignalMouseUp( *event );
+	getRenderer()->makeCurrentContext( true );
+
+	CollectorEvent<MouseEvent> collector( event );
+	mSignalMouseUp.emit( collector, *event );
 	if( ! event->isHandled() )
 		getApp()->mouseUp( *event );
 }
 
 void Window::emitMouseWheel( MouseEvent *event )
 {
-	getRenderer()->makeCurrentContext();
-	mSignalMouseWheel.set_combiner( EventCombiner<cinder::app::MouseEvent>( event ) );
-	mSignalMouseWheel( *event );
+	getRenderer()->makeCurrentContext( true );
+
+	CollectorEvent<MouseEvent> collector( event );
+	mSignalMouseWheel.emit( collector, *event );
 	if( ! event->isHandled() )
 		getApp()->mouseWheel( *event );
 }
 
 void Window::emitMouseMove( MouseEvent *event )
 {
-	getRenderer()->makeCurrentContext();
-	mSignalMouseMove.set_combiner( EventCombiner<cinder::app::MouseEvent>( event ) );
-	mSignalMouseMove( *event );
+	getRenderer()->makeCurrentContext( true );
+
+	CollectorEvent<MouseEvent> collector( event );
+	mSignalMouseMove.emit( collector, *event );
 	if( ! event->isHandled() )
 		getApp()->mouseMove( *event );
 }
 
 void Window::emitTouchesBegan( TouchEvent *event )
 {
-	getRenderer()->makeCurrentContext();
-	mSignalTouchesBegan.set_combiner( EventCombiner<cinder::app::TouchEvent>( event ) );
-	mSignalTouchesBegan( *event );
+	getRenderer()->makeCurrentContext( true );
+
+	CollectorEvent<TouchEvent> collector( event );
+	mSignalTouchesBegan.emit( collector, *event );
 	if( ! event->isHandled() )
 		getApp()->touchesBegan( *event );
 }
 
 void Window::emitTouchesMoved( TouchEvent *event )
 {
-	getRenderer()->makeCurrentContext();
-	mSignalTouchesMoved.set_combiner( EventCombiner<cinder::app::TouchEvent>( event ) );
-	mSignalTouchesMoved( *event );
+	getRenderer()->makeCurrentContext( true );
+
+	CollectorEvent<TouchEvent> collector( event );
+	mSignalTouchesMoved.emit( collector, *event );
 	if( ! event->isHandled() )
 		getApp()->touchesMoved( *event );
 }
 
 void Window::emitTouchesEnded( TouchEvent *event )
 {
-	getRenderer()->makeCurrentContext();
-	mSignalTouchesEnded.set_combiner( EventCombiner<cinder::app::TouchEvent>( event ) );
-	mSignalTouchesEnded( *event );
+	getRenderer()->makeCurrentContext( true );
+
+	CollectorEvent<TouchEvent> collector( event );
+	mSignalTouchesEnded.emit( collector, *event );
 	if( ! event->isHandled() )
 		getApp()->touchesEnded( *event );
 }
@@ -387,34 +397,44 @@ const std::vector<TouchEvent::Touch>& Window::getActiveTouches() const
 
 void Window::emitKeyDown( KeyEvent *event )
 {
-	getRenderer()->makeCurrentContext();
-	mSignalKeyDown.set_combiner( EventCombiner<cinder::app::KeyEvent>( event ) );
-	mSignalKeyDown( *event );
+	getRenderer()->makeCurrentContext( true );
+
+	CollectorEvent<KeyEvent> collector( event );
+	mSignalKeyDown.emit( collector, *event );
 	if( ! event->isHandled() )
 		getApp()->keyDown( *event );
 }
 
 void Window::emitKeyUp( KeyEvent *event )
 {
-	getRenderer()->makeCurrentContext();
-	mSignalKeyUp.set_combiner( EventCombiner<cinder::app::KeyEvent>( event ) );
-	mSignalKeyUp( *event );
+	getRenderer()->makeCurrentContext( true );
+
+	CollectorEvent<KeyEvent> collector( event );
+	mSignalKeyUp.emit( collector, *event );
 	if( ! event->isHandled() )
 		getApp()->keyUp( *event );
 }
 
 void Window::emitDraw()
 {
-	mSignalDraw();
+	// On the Mac the active GL Context can change behind our back in some scenarios; forcing the context switch on other platforms is expensive though
+#if defined( CINDER_MAC )
+	getRenderer()->makeCurrentContext( true );
+#else
+	getRenderer()->makeCurrentContext( false );
+#endif	
+	
+	mSignalDraw.emit();
 	getApp()->draw();
-	mSignalPostDraw();
+	mSignalPostDraw.emit();
 }
 
 void Window::emitFileDrop( FileDropEvent *event )
 {
-	getRenderer()->makeCurrentContext();
-	mSignalFileDrop.set_combiner( EventCombiner<cinder::app::FileDropEvent>( event ) );
-	mSignalFileDrop( *event );
+	getRenderer()->makeCurrentContext( true );
+
+	CollectorEvent<FileDropEvent> collector( event );
+	mSignalFileDrop.emit( collector, *event );
 	if( ! event->isHandled() )
 		getApp()->fileDrop( *event );
 }

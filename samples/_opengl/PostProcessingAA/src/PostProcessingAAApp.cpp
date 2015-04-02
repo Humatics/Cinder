@@ -32,7 +32,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "cinder/app/AppNative.h"
+#include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
 #include "cinder/gl/Context.h"
@@ -40,6 +40,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "cinder/Camera.h"
 #include "cinder/Timer.h"
 #include "cinder/Utilities.h"
+#include "cinder/Log.h"
 
 #include "fxaa/FXAA.h"
 #include "smaa/SMAA.h"
@@ -49,13 +50,11 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-class PostProcessingAAApp : public AppNative {
-public:
+class PostProcessingAAApp : public App {
+  public:
 	enum SMAAMode { SMAA_EDGE_DETECTION, SMAA_BLEND_WEIGHTS, SMAA_BLEND_NEIGHBORS };
 	enum DividerMode { MODE_COMPARISON, MODE_ORIGINAL1, MODE_FXAA, MODE_SMAA, MODE_ORIGINAL2, MODE_COUNT };
-public:
-	void prepareSettings( Settings* settings ) override;
-
+  public:
 	void setup() override;
 	void update() override;
 	void draw() override;
@@ -97,12 +96,6 @@ private:
 	vec2                mMouse;          // Keep track of the mouse cursor.
 };
 
-void PostProcessingAAApp::prepareSettings( Settings* settings )
-{
-	settings->disableFrameRate();
-	settings->setWindowSize( 1280, 720 );
-}
-
 void PostProcessingAAApp::setup()
 {
 	try {
@@ -111,13 +104,9 @@ void PostProcessingAAApp::setup()
 		mInfoOriginal = gl::Texture::create( loadImage( loadAsset( "original.png" ) ) );
 	}
 	catch( const std::exception& e ) {
-		console() << "Failed to load textures: " << e.what() << std::endl;
+		CI_LOG_E( "Failed to load textures: " << e.what() );
 		quit();
 	}
-
-	mPistons.setup();
-	mFXAA.setup();
-	mSMAA.setup();
 
 	mSMAAMode = SMAA_BLEND_NEIGHBORS;
 
@@ -378,4 +367,10 @@ void PostProcessingAAApp::keyDown( KeyEvent event )
 	}
 }
 
-CINDER_APP_NATIVE( PostProcessingAAApp, RendererGl( RendererGl::Options().msaa( 0 ) ) )
+void prepareSettings( App::Settings *settings )
+{
+	settings->disableFrameRate();
+	settings->setWindowSize( 1280, 720 );
+}
+
+CINDER_APP( PostProcessingAAApp, RendererGl( RendererGl::Options().msaa( 0 ) ), prepareSettings )

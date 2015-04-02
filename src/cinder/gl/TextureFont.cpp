@@ -24,6 +24,7 @@
 #include "cinder/gl/Context.h"
 #include "cinder/gl/Vao.h"
 #include "cinder/gl/Vbo.h"
+#include "cinder/gl/scoped.h"
 
 #include "cinder/Text.h"
 #include "cinder/ip/Fill.h"
@@ -38,16 +39,14 @@
 	#else
 		#include <CoreGraphics/CoreGraphics.h>
 	#endif
+#elif defined( CINDER_MSW )
+	#include <Windows.h>
 #endif
 #include "cinder/Unicode.h"
 
 #include <set>
 
-#if defined( _MSC_VER ) && ( _MSC_VER >= 1600 ) || defined( _LIBCPP_VERSION )
-	using std::unordered_map;
-#else
-	using boost::unordered_map;
-#endif
+using std::unordered_map;
 
 using namespace std;
 

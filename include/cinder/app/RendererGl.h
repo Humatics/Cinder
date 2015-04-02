@@ -24,14 +24,14 @@
 #pragma once
 
 #include "cinder/app/Renderer.h"
-#include "cinder/gl/gl.h"
+#include "cinder/gl/platform.h"
 
 #if defined( CINDER_MAC )
 	#if defined __OBJC__
-		@class AppImplCocoaRendererGl;
+		@class RendererImplGlMac;
 		@class NSOpenGLContext;
 	#else
-		class AppImplCocoaRendererGl;
+		class RendererImplGlMac;
 		class NSOpenGLContext;
 	#endif
 	typedef struct _CGLContextObject       *CGLContextObj;
@@ -39,11 +39,11 @@
 #elif defined( CINDER_COCOA_TOUCH )
 	#if defined __OBJC__
 		typedef struct CGContext * CGContextRef;
-		@class AppImplCocoaTouchRendererGl;
+		@class RendererImplGlCocoaTouch;
 		@class EAGLContext;
 	#else
 		typedef struct CGContext * CGContextRef;
-		class AppImplCocoaTouchRendererGl;
+		class RendererImplGlCocoaTouch;
 		class EAGLContext;
 	#endif
 #endif
@@ -160,22 +160,27 @@ class RendererGl : public Renderer {
  
 #if defined( CINDER_COCOA )
 	#if defined( CINDER_MAC )
-		virtual void setup( App *aApp, CGRect frame, NSView *cinderView, RendererRef sharedRenderer, bool retinaEnabled );
+		virtual void setup( CGRect frame, NSView *cinderView, RendererRef sharedRenderer, bool retinaEnabled );
 		virtual CGLContextObj			getCglContext();
 		virtual CGLPixelFormatObj		getCglPixelFormat();
 		virtual NSOpenGLContext*		getNsOpenGlContext();		
 	#elif defined( CINDER_COCOA_TOUCH )
-		virtual void 	setup( App *aApp, const Area &frame, UIView *cinderView, RendererRef sharedRenderer );
+		virtual void 	setup( const Area &frame, UIView *cinderView, RendererRef sharedRenderer );
 		virtual bool 	isEaglLayer() const { return true; }
 		EAGLContext*	getEaglContext() const;
 	#endif
 	virtual void	setFrameSize( int width, int height );
 #elif defined( CINDER_MSW )
-	virtual void	setup( App *aApp, HWND wnd, HDC dc, RendererRef sharedRenderer );
-	virtual void	kill();
-	virtual HWND	getHwnd() { return mWnd; }
-	virtual void	prepareToggleFullScreen();
-	virtual void	finishToggleFullScreen();
+	void	setup( HWND wnd, HDC dc, RendererRef sharedRenderer ) override;
+	void	kill() override;
+	HWND	getHwnd() override { return mWnd; }
+	HDC		getDc() override;
+	void	prepareToggleFullScreen();
+	void	finishToggleFullScreen();
+#elif defined( CINDER_WINRT )
+	void	setup( ::Platform::Agile<Windows::UI::Core::CoreWindow> wnd, RendererRef sharedRenderer ) override;
+	void	prepareToggleFullScreen();
+	void	finishToggleFullScreen();
 #endif
 
 	const Options&	getOptions() const { return mOptions; }
@@ -183,9 +188,9 @@ class RendererGl : public Renderer {
 	void			startDraw() override;
 	void			finishDraw() override;
 	void			defaultResize() override;
-	void			makeCurrentContext() override;
+	void			makeCurrentContext( bool force = false ) override;
 	void			swapBuffers()override;
-	Surface8u		copyWindowSurface( const Area &area ) override;
+	Surface8u		copyWindowSurface( const Area &area, int32_t windowHeightPixels ) override;
 
 	//! Overrides Renderer's start draw implementation for custom hooks. Only useful in advanced use cases.
 	void setStartDrawFn( const std::function<void( Renderer* )>& function ) { mStartDrawFn = function; }
@@ -197,18 +202,22 @@ protected:
 
 	Options		mOptions;
 #if defined( CINDER_MAC )
-	AppImplCocoaRendererGl		*mImpl;
+	RendererImplGlMac		*mImpl;
 #elif defined( CINDER_COCOA_TOUCH )
-	AppImplCocoaTouchRendererGl	*mImpl;
+	RendererImplGlCocoaTouch	*mImpl;
 #elif defined( CINDER_MSW )
 	#if defined( CINDER_GL_ANGLE )
-		class AppImplMswRendererAngle	*mImpl;
-		friend class					AppImplMswRendererAngle;
+		class RendererImplGlAngle	*mImpl;
+		friend class				RendererImplGlAngle;
 	#else
-		class AppImplMswRendererGl		*mImpl;
-		friend class					AppImplMswRendererGl;
+		class RendererImplGlMsw		*mImpl;
+		friend class				RendererImplGlMsw;
 	#endif
 	HWND						mWnd;
+#elif defined( CINDER_WINRT )
+	class RendererImplGlAngle	*mImpl;
+	friend class				RendererImplGlAngle;
+	::Platform::Agile<Windows::UI::Core::CoreWindow>	mWnd;
 #endif
 
 	std::function<void( Renderer* )> mStartDrawFn;

@@ -24,7 +24,6 @@
 // This file is only meant to be included by QuickTime.h
 #pragma once
 
-#include "cinder/gl/gl.h"
 #include "cinder/gl/Texture.h"
 #include "cinder/DataSource.h"
 #include "cinder/Display.h"
@@ -152,12 +151,12 @@ class MovieBase {
 	//! Returns the native AvFoundation Player data structure
 	AVPlayer*	getPlayerHandle() const { return mPlayer; }
 	
-	signals::signal<void()>&	getNewFrameSignal() { return mSignalNewFrame; }
-	signals::signal<void()>&	getReadySignal() { return mSignalReady; }
-	signals::signal<void()>&	getCancelledSignal() { return mSignalCancelled; }
-	signals::signal<void()>&	getEndedSignal() { return mSignalEnded; }
-	signals::signal<void()>&	getJumpedSignal() { return mSignalJumped; }
-	signals::signal<void()>&	getOutputWasFlushedSignal() { return mSignalOutputWasFlushed; }
+	signals::Signal<void()>&	getNewFrameSignal() { return mSignalNewFrame; }
+	signals::Signal<void()>&	getReadySignal() { return mSignalReady; }
+	signals::Signal<void()>&	getCancelledSignal() { return mSignalCancelled; }
+	signals::Signal<void()>&	getEndedSignal() { return mSignalEnded; }
+	signals::Signal<void()>&	getJumpedSignal() { return mSignalJumped; }
+	signals::Signal<void()>&	getOutputWasFlushedSignal() { return mSignalOutputWasFlushed; }
 	
  protected:
 	MovieBase();
@@ -200,7 +199,7 @@ class MovieBase {
 
 	std::mutex					mMutex;
 	
-	signals::signal<void()>		mSignalNewFrame, mSignalReady, mSignalCancelled, mSignalEnded, mSignalJumped, mSignalOutputWasFlushed;
+	signals::Signal<void()>		mSignalNewFrame, mSignalReady, mSignalCancelled, mSignalEnded, mSignalJumped, mSignalOutputWasFlushed;
 
 	// internal callbacks used from NSObject delegate
 	void playerReady();

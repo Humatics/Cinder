@@ -1,16 +1,21 @@
-#include "cinder/app/AppBasic.h"
+#include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/Camera.h"
 #include "cinder/params/Params.h"
+#include "cinder/gl/gl.h"
 
 #include <functional>
 
 using namespace ci;
 using namespace ci::app;
 
-class TweakBarApp : public AppBasic {
+void prepareSettings( App::Settings *settings )
+{
+	settings->setHighDensityDisplayEnabled();
+}
+
+class TweakBarApp : public App {
   public:
-	void prepareSettings( Settings *settings ) { settings->enableHighDensityDisplay(); }
 	void setup();
 	void resize();
 	void draw();
@@ -107,4 +112,4 @@ void TweakBarApp::draw()
 	mParams->draw();
 }
 
-CINDER_APP_BASIC( TweakBarApp, RendererGl )
+CINDER_APP( TweakBarApp, RendererGl, prepareSettings )

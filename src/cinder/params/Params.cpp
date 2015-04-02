@@ -20,7 +20,7 @@
  POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "cinder/app/App.h"
+#include "cinder/app/AppBase.h"
 #include "cinder/params/Params.h"
 #include "cinder/Utilities.h"
 
@@ -28,7 +28,7 @@
 
 #if defined( USE_DIRECTX )
 	#include "cinder/dx/dx.h"
-	#include "cinder/app/AppImplMswRendererDx.h"
+	#include "cinder/app/RendererImplDx.h"
 #else
 	#include "cinder/gl/Environment.h"
 #endif
@@ -143,6 +143,7 @@ void mouseDown( int twWindowId, app::MouseEvent &event )
 
 void mouseUp( int twWindowId, app::MouseEvent &event )
 {
+	auto oldCtx = gl::context();
 	pushGlState();
 	
 	TwSetCurrentWindow( twWindowId );
@@ -155,6 +156,9 @@ void mouseUp( int twWindowId, app::MouseEvent &event )
 	else
 		button = TW_MOUSE_MIDDLE;
 	event.setHandled( TwMouseButton( TW_MOUSE_RELEASED, button ) != 0 );
+	
+	// The button handler may have tweaked the current GL context, in which case, let's force it back to what it was
+	oldCtx->makeCurrent( true );
 	
 	popGlState();
 }
@@ -316,7 +320,7 @@ int initAntGl( weak_ptr<app::Window> winWeak )
 
 InterfaceGl::InterfaceGl( const std::string &title, const ivec2 &size, const ColorA &color )
 {
-	init( app::App::get()->getWindow(), title, size, color );
+	init( app::getWindow(), title, size, color );
 }
 
 InterfaceGl::InterfaceGl( const app::WindowRef &window, const std::string &title, const ivec2 &size, const ColorA &color )

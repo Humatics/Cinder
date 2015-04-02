@@ -1,4 +1,4 @@
-#include "cinder/app/AppNative.h"
+#include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/Log.h"
 
@@ -19,11 +19,11 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-class NodeTestApp : public AppNative {
+class NodeTestApp : public App {
 public:
-	void setup();
-	void resize();
-	void draw();
+	void setup() override;
+	void resize() override;
+	void draw() override;
 
 	void setupGen();
 	void setup2to1();
@@ -59,8 +59,8 @@ void NodeTestApp::setup()
 	
 	auto ctx = audio::master();
 	mGain = ctx->makeNode( new audio::GainNode( 0.04f ) );
-	mGen = ctx->makeNode( new audio::GenSineNode( 440 ) );
-	mNoise = ctx->makeNode( new audio::GenNoiseNode() );
+	mGen = ctx->makeNode<audio::GenSineNode>( 440 );
+	mNoise = ctx->makeNode<audio::GenNoiseNode>();
 
 	mMonitor = audio::master()->makeNode( new audio::MonitorNode( audio::MonitorNode::Format().windowSize( 2048 ) ) );
 
@@ -391,4 +391,4 @@ void NodeTestApp::draw()
 	drawWidgets( mWidgets );
 }
 
-CINDER_APP_NATIVE( NodeTestApp, RendererGl )
+CINDER_APP( NodeTestApp, RendererGl )
