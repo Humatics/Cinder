@@ -273,6 +273,9 @@ class Rand {
 			return v1 * m;
 		}
 	}
+
+	//! Returns a reference to the base random number generator.
+	static std::mt19937& getBaseRNG() { return sBase; }
 	
   private:
 	std::mt19937 mBase;
