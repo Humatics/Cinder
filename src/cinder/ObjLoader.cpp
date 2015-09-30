@@ -154,8 +154,8 @@ void ObjLoader::parseMaterial( std::shared_ptr<IStreamCinder> material )
         if( line.empty() || line[0] == '#' )
             continue;
 
-		if( line.back() == '\\' ) {
-			auto next = mStream->readLine();
+		while( line.back() == '\\' && ! material->isEof() ) {
+			auto next = material->readLine();
 			line = line.substr( 0, line.size() - 1 ) + next;
 		}
 
@@ -197,7 +197,7 @@ void ObjLoader::parse( bool includeNormals, bool includeTexCoords )
         if( line.empty() || line[0] == '#' )
             continue;
 
-		if( line.back() == '\\' ) {
+		while( line.back() == '\\' && ! mStream->isEof() ) {
 			auto next = mStream->readLine();
 			line = line.substr( 0, line.size() - 1 ) + next;
 		}
