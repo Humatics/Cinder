@@ -8,3 +8,6 @@
 	path = include/boost
 	url = git://github.com/cinder/Cinder-Boost.git
 	branch = boost_1_58
+[submodule "blocks/Cinder-OpenCV"]
+	path = blocks/Cinder-OpenCV
+	url = https://github.com/sosolimited/Cinder-OpenCV.git
