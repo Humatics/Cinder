@@ -50,6 +50,25 @@ void GetSpecialDirs::setup()
 	}
 	*/
 
+	auto picture = ci::android::getPicturesDirectory() / "window.png";
+	if (fs::exists(picture))
+	{
+		CI_LOG_I("Loading previous screenshot");
+		try
+		{
+			auto surf = loadImage(loadFile(picture));
+      CI_LOG_I("Surface dimensions: " << surf->getWidth() << ", " << surf->getHeight());
+		}
+		catch (const std::exception &exc)
+		{
+			CI_LOG_E("Exception loading image: " << exc.what());
+		}
+	}
+	else
+	{
+		CI_LOG_I("No previous screenshot");
+	}
+
 	try {
 		auto file = ci::android::getPicturesDirectory() / "window.png";
 		CI_LOG_I("Attempting to save window to: " << file.string());
@@ -61,6 +80,15 @@ void GetSpecialDirs::setup()
 		CI_LOG_I("Copied window surface.");
 		writeImage(file, surf);
 		CI_LOG_I("Wrote image");
+
+		if (! fs::exists(file))
+   	{
+     	CI_LOG_E("Image file doesn't exist after writing.");
+    }
+    else
+    {
+    	CI_LOG_I("Image file exists on disk.");
+    }
 	}
 	catch( std::exception &exc )
 	{

@@ -65,7 +65,7 @@ android {
     }
 
     cinder {
-        ndkDir = "${projectDir}/../../../../../../../android-ndk"
+        ndkDir = "/Users/soso/Code/android-ndk"
         cinderDir = "${projectDir}/../../../../../.."
         verbose = false 
         moduleName = "GetSpecialDirs"
